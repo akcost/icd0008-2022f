@@ -1,0 +1,101 @@
+@page
+@model WebApp.Pages.Djs.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+    var totalPayAll = 0;
+    var totalDuration = 0;
+    var totalSongs = 0;
+    var totalSets = 0;
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Djs[0].DjName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Djs[0].PricePerSecond)
+        </th>
+        <th>
+            Sets
+        </th>
+        <th>
+            Songs Played
+        </th>
+        <th>
+            Total Duration of Songs Played
+        </th>
+        <th>
+            Total Pay
+        </th>
+
+        <th>
+
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Djs)
+    {
+        <tr>
+            @{
+                var totalLength = Model.GetTotalSetLength(item);
+                totalPayAll += Model.TotalLength * item.PricePerSecond;
+                totalDuration += Model.TotalLength;
+                totalSongs += Model.TotalSongs;
+                totalSets += item.Sets!.Count;
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.DjName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PricePerSecond)
+            </td>
+            <td>
+                @item.Sets!.Count
+            </td>
+            <td>
+                @Model.TotalSongs
+            </td>
+            <td>
+
+                @totalLength
+            </td>
+            <td>
+                @(item.PricePerSecond * Model.TotalLength) EUR
+            </td>
+
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>TOTAL</td>
+        <td></td>
+        <td>@totalSets</td>
+        <td>@totalSongs</td>
+        <td>@Model.GetFormattedSongTime(totalDuration)</td>
+        <td>@totalPayAll EUR</td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>

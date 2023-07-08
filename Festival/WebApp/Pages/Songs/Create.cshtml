@@ -1,0 +1,66 @@
+@page
+@model WebApp.Pages.Songs.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Song</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Song.SongName" class="control-label"></label>
+                <input asp-for="Song.SongName" class="form-control" />
+                <span asp-validation-for="Song.SongName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Song.Composer" class="control-label"></label>
+                <input asp-for="Song.Composer" class="form-control" />
+                <span asp-validation-for="Song.Composer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Song.Performer" class="control-label"></label>
+                <input asp-for="Song.Performer" class="form-control" />
+                <span asp-validation-for="Song.Performer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Song.LyricArtist" class="control-label"></label>
+                <input asp-for="Song.LyricArtist" class="form-control" />
+                <span asp-validation-for="Song.LyricArtist" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Song.Length" class="control-label"></label>
+                <input asp-for="Song.Length" class="form-control" />
+                <span asp-validation-for="Song.Length" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Song.Category" class="control-label"></label>
+                <select asp-for="Song.CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<br/>
+<div>
+    @if (Model.SetId != null)
+    {
+        <a asp-page="../Sets/Select" asp-route-id="@Model.SetId">Back to set</a>
+
+    }
+    else
+    {
+        <a asp-page="Index">Back to List</a>
+    }
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

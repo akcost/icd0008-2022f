@@ -1,0 +1,68 @@
+@page
+@model WebApp.Pages.Sets.Select
+
+<h1>@Model.ThisSet!.SetName</h1>
+<h4>DJ: @Model.ThisSet.Dj!.DjName</h4>
+<h5>
+    Total duration: @Model.GetTotalSetLength(Model.ThisSet.SetSongs)
+</h5>
+
+<h6>Total pay for DJ: @(Model.ThisSet.Dj.PricePerSecond * Model.TotalLength) EUR</h6>
+
+@{
+    System.Diagnostics.Debug.Assert(Model.ThisSet.SetSongs != null, "Model.ThisSet.SetSongs != null");
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            Song
+        </th>
+        <th>
+            Length
+        </th>
+        <th>
+            Composer
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var setSong in Model.ThisSet.SetSongs)
+    {
+        if (setSong.Song != null)
+        {
+            var song = setSong.Song;
+            var length = Model.GetFormattedSongTime(setSong.Song.Length);
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => song.SongName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => length)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => song.Composer)
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+
+
+<div>
+    <a asp-page="../Songs/Index" asp-route-SetId="@Model.SetId">Add an existing song</a>
+</div>
+<br/>
+<div>
+    <a asp-page="../Songs/Create" asp-route-SetId="@Model.SetId">Add a new song</a>
+</div>
+<br/>
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

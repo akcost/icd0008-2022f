@@ -1,0 +1,106 @@
+@page
+@model WebApp.Pages.Songs.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Songs</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="get">
+            <input type="hidden" asp-for="SetId"/>
+            <div class="form-group">
+                <label asp-for="Search" class="control-label"></label>
+                <input asp-for="Search" class="form-control"/>
+            </div>
+            <br/>
+
+            <div class="form-group">
+                <input type="submit" value="Search" class="btn btn-primary"/>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<br/>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Songs[0].SongName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Songs[0].Composer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Songs[0].Performer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Songs[0].LyricArtist)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Songs[0].Length)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Songs[0].Category)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Songs)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SongName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Composer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Performer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LyricArtist)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Length)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+            </td>
+            @{
+                if (Model.SetId != null)
+                {
+                    <td>
+                        <a asp-page="../SetSongs/Create" asp-route-SongId="@item.Id" asp-route-SetId="@Model.SetId">Add song to set</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div>
+    @if (Model.SetId != null)
+    {
+        <a asp-page="../Sets/Select" asp-route-id="@Model.SetId">Back to set</a>
+
+    }
+</div>

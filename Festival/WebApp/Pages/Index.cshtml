@@ -1,0 +1,70 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<h1>Weekend Festival</h1>
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="get">
+            @* <input type="hidden" asp-for="Search"/> *@
+            <div class="form-group">
+                <label asp-for="Search" class="control-label"></label>
+                <input asp-for="Search" class="form-control"/>
+            </div>
+            <br/>
+
+            <div class="form-group">
+                <input type="submit" value="Search" class="btn btn-primary"/>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<br/>
+<br/>
+
+<h3>
+    <a asp-page="./Sets/Index">Sets</a>
+</h3>
+<div class="grid text-center">
+    <div class="row">
+        @foreach (var set in Model.Sets)
+        {
+            <div class="col">
+                <a asp-page="/Sets/Select" asp-route-id="@set.Id">
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">@set.SetName</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">DJ: @set.Dj?.DjName</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+<br/>
+<h5>
+    <a asp-page="./Djs/Index">DJs</a>
+</h5>
+<div class="grid text-center">
+    <div class="row">
+        @foreach (var dj in Model.Djs)
+        {
+            <div class="col">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@dj.DjName</h5>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
