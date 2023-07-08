@@ -1,0 +1,73 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.game-table {
+  width: initial;
+  /*background-color: #cfe2ff;*/
+}
+
+.game-table-cell {
+  width: 75px;
+  height: 75px;
+}
+
+.game-table-cell-black {
+  background-color: black !important;
+}
+
+.game-table-cell-black-king {
+  background-color: #383320 !important;
+}
+
+.game-table-cell-white {
+  background-color: white !important;
+}
+
+.game-table-cell-white-king {
+  background-color: #727272 !important;
+}
+
+.game-table-cell-move-possible-black {
+  background-color: yellow !important;
+
+}
+
+.game-table-cell-move-possible-white {
+  background-color: red !important;
+}
+
+.game-table-cell-brown {
+  background-color: saddlebrown !important;
+}
+
+.game-table-cell-navajo {
+  background-color: navajowhite !important;
+}
+
+.game-table-cell-selected {
+  background-color: greenyellow !important;
+}
+
+.game-table-cell-selected-black-piece {
+  background-color: indigo !important;
+}
+
+.game-table-cell-selected-white-piece {
+  background-color: yellow !important;
+}

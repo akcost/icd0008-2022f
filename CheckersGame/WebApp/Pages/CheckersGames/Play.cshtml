@@ -1,0 +1,217 @@
+@page
+@using Domain
+@using System.Security.Principal
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using System.Security.Policy
+@using GameBrain
+@model WebApp.Pages.CheckersGames.Play
+
+
+@if (Model.PlayerNo != 2)
+{
+    <h1>Playing as: @GetPlayerName() (@(Model.PlayerNo == 0 ? "white" : "black"))</h1>
+}
+@if (Model.CheckersGame.GameWonByPlayer == null)
+{
+    <h2>Next move: @(Model.Brain.NextMoveByBlack() ? $"Player B - {Model.CheckersGame.Player2Name} - BLACK" : $"Player A - {Model.CheckersGame.Player1Name} - WHITE")</h2>
+}
+
+@{
+    var (whiteScore, blackScore) = Model.Brain.GetScore();
+    <h3>White score: @(whiteScore)</h3>
+    <h3>Black score: @(blackScore)</h3>
+}
+
+<table class="table table-bordered game-table">
+    @{
+        var boardCopy = Model.Brain.GetBoard();
+        var availableMoves = Model.Brain.GetAvailableMoves();
+        if (availableMoves.Count == 0)
+        {
+            Model.CheckersGame.GameOverAt = DateTime.Now;
+            Model.CheckersGame.GameWonByPlayer = !Model.Brain.NextMoveByBlack() ? Model.CheckersGame.Player2Name : Model.CheckersGame.Player1Name;
+            <h2>Game Winner: @(Model.CheckersGame.GameWonByPlayer)</h2>
+            Model.EndGame();
+            return;
+        }
+    }
+    @for (var y = 0; y < boardCopy[0].Length; y++)
+    {
+        <tr>
+            @for (var x = 0; x < boardCopy.Length; x++)
+            {
+                var valueX = ViewContext.HttpContext.Request.Query["x"].ToString();
+                var valueY = ViewContext.HttpContext.Request.Query["y"].ToString();
+                var posX = 0;
+                var posY = 0;
+
+                if (valueX != "" && valueY != "")
+                {
+                    posX = int.Parse(valueX);
+                    posY = int.Parse(valueY);
+                }
+
+                var newX = ViewContext.HttpContext.Request.Query["newX"].ToString();
+                var newY = ViewContext.HttpContext.Request.Query["newY"].ToString();
+
+                Coordinate coordinate = new Coordinate { X = x, Y = y };
+
+                <td class="game-table-cell @GetCellBgrClass(boardCopy[x][y], x, y, posX, posY, newX, newY, availableMoves)"
+
+                    @if (IsPlayerMove())
+                    {
+                        if (availableMoves.ContainsKey(coordinate))
+                        {
+                            var oldX = ViewContext.HttpContext.Request.Query["x"].ToString();
+                            var oldY = ViewContext.HttpContext.Request.Query["y"].ToString();
+                            if (oldX != "" && oldY != "")
+                            {
+                                int xPos = int.Parse(oldX);
+                                int yPos = int.Parse(oldY);
+
+
+                                if (newX != "" && newY != "")
+                                {
+                                    string resp = "/CheckersGames/Play?id=" + Model.CheckersGame.Id + "&playerNo=" + Model.PlayerNo;
+                                    Response.Redirect(resp);
+                                }
+                                else
+                                {
+                                    //unselect piece
+                                    if (x == xPos && y == yPos)
+                                    {
+                                        <text>
+                                            onclick="window.location = '/CheckersGames/Play?id=@Model.CheckersGame.Id&playerNo=@Model.PlayerNo'"
+                                        </text>
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                            onclick="window.location = '/CheckersGames/Play?id=@Model.CheckersGame.Id&playerNo=@Model.PlayerNo&x=@x&y=@y'"
+                                        </text>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <text>
+                                    onclick="window.location = '/CheckersGames/Play?id=@Model.CheckersGame.Id&playerNo=@Model.PlayerNo&x=@x&y=@y'"
+                                </text>
+                            }
+                        }
+                        else
+                        {
+                            var oldX = ViewContext.HttpContext.Request.Query["x"].ToString();
+                            var oldY = ViewContext.HttpContext.Request.Query["y"].ToString();
+                            if (oldX != "" && oldY != "" && newX == "" && newY == "")
+                            {
+                                int xPos = int.Parse(oldX);
+                                int yPos = int.Parse(oldY);
+
+
+                                if (availableMoves.ContainsKey(new Coordinate { X = xPos, Y = yPos }))
+                                {
+                                    if (availableMoves[new Coordinate { X = xPos, Y = yPos }].Contains(new Coordinate { X = x, Y = y }))
+                                    {
+                                        <text>
+                                            onclick="window.location = '/CheckersGames/Play?id=@Model.CheckersGame.Id&playerNo=@Model.PlayerNo&x=@xPos&y=@yPos&newX=@x&newY=@y'"
+                                        </text>
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <text>
+                            onclick="window.location='/CheckersGames/Play?id=@Model.CheckersGame.Id&playerNo=@Model.PlayerNo'"
+                        </text>
+                    }>
+                </td>
+            }
+        </tr>
+    }
+
+</table>
+
+@functions
+{
+    string GetCellBgrClass(EGamePiece? piece, int x, int y, int posX, int posY, string newX, string newY, Dictionary<Coordinate, List<Coordinate>> availableMoves)
+    {
+    //Check if piece is selected
+        if (x == posX && y == posY)
+        {
+            if (Model.Brain.NextMoveByBlack() && piece is EGamePiece.Black or EGamePiece.BlackKing)
+            {
+                return "game-table-cell-selected-black-piece";
+            }
+
+            if (!Model.Brain.NextMoveByBlack() && piece is EGamePiece.White or EGamePiece.WhiteKing)
+            {
+                return "game-table-cell-selected-white-piece";
+            }
+        }
+
+        switch (piece)
+        {
+            case EGamePiece.Black:
+                return "game-table-cell-black";
+            case EGamePiece.White:
+                return "game-table-cell-white";
+            case EGamePiece.BlackKing:
+                return "game-table-cell-black-king";
+            case EGamePiece.WhiteKing:
+                return "game-table-cell-white-king";
+            case null when (x + y) % 2 == 0:
+                return "game-table-cell-brown";
+
+            case null:
+            {
+                if ((posX != 0 || posY != 0) && (newX == "" || newY == ""))
+                {
+                    string cellClass = Model.Brain.NextMoveByBlack()
+                        ? "game-table-cell-move-possible-black"
+                        : "game-table-cell-move-possible-white";
+
+                    if (availableMoves.ContainsKey(new Coordinate { X = posX, Y = posY }))
+                    {
+                        if (availableMoves[new Coordinate { X = posX, Y = posY }].Contains(new Coordinate { X = x, Y = y }))
+                        {
+                            return cellClass;
+                        }
+                    }
+                }
+
+                return "game-table-cell-navajo";
+            }
+            default:
+                return "";
+        }
+    }
+
+    bool IsPlayerMove()
+    {
+        if (Model.PlayerNo == 2)
+        {
+            return true;
+        }
+        if (!Model.Brain.NextMoveByBlack() && Model.PlayerNo == 0)
+        {
+            return true;
+        }
+
+        if (Model.Brain.NextMoveByBlack() && Model.PlayerNo == 1)
+        {
+            return true;
+        }
+
+
+        return false;
+    }
+
+    string GetPlayerName()
+    {
+        return Model.PlayerNo == 0 ? Model.CheckersGame.Player1Name : Model.CheckersGame.Player2Name;
+    }
+
+}
